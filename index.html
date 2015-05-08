@@ -65,7 +65,7 @@ function query() {
     return qd;
 }
 
-function isHiRes {
+function isHiRes() {
     return ('hires' in query() && query().hires.length > 0 && parseInt(query().hires[0]) > 0);
 }
 
