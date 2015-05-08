@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Abulsme True Binary Time, Fenhl's edition</title>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" type="text/css" href="http://fenhl.net/lib/fenhl.css" />
+        <link rel="shortcut icon" href="http://fenhl.net/ava/pineapple/p-sq-16.png" />
+        <script type="text/javascript">
+/*******************************************************************************
+* Snarkles.Net Useless Binary Time (SNUBT)
+* 
+* ThinkGeek's Binary LED Clock... in JavaScript! 
+* http://www.thinkgeek.com/cubegoodies/lights/59e0/
+* 
+* Author: snarkles - http://snarkles.net/ - scripts [at] snarkles [dot] net
+* Date: 09-Mar-2004
+*
+* Feel free to use this on your site, but please leave these comments 
+* in tact. Thanks. :)
+*******************************************************************************/
+
+/*******************************************************************************
+* Abulsme.com TRUE Binary Time
+* 
+* Modified from Snarkles' code to do "true binary time" rather than just
+* Show the digits of the traditional HH:MM:SS time in binary like the ThinkGeek
+* clock.  Instead each bit represents an appropriate fractional portion of the 
+* day.  The first bit represents a half day, the second a quarter day, etc.  
+* The clock shows the local time from your computer.  The last bit flips once 
+* every 1/65536th of a day, otherwise known as approximately every 1.3184 
+* seconds.
+*
+* Author: Abulsme - http://www.abulsme.com/ - abulsme@abulsme.com
+* Version: 1.5
+* Date: 11 Jan 2005
+*
+* Feel free to use this on your site, but please leave these comments 
+* intact too. Thanks. :)
+*******************************************************************************/
+
+/*******************************************************************************
+* Fenhl Fullscreen True Binary Time
+* 
+* Modified from Abulsme's code to use a simple table and black and white colors
+* rather than images. It's also fullscreen no matter the screen size.
+*
+* Warning: parts of this javascript are dynamically generated and can be altered
+* through the query string.
+*
+* Author: Fenhl - http://fenhl.net/ - fenhl@fenhl.net
+* Version: 2.0.0
+* Date: 08 May 2015
+*
+* Feel free to use this on your site, but please leave these comments 
+* intact too. Thanks. :)
+*******************************************************************************/
+
+// get query string as object, FROM http://stackoverflow.com/a/21152762/667338
+function query() {
+    var qd = {};
+    location.search.substr(1).split('&').forEach(function(item) {
+        var k = item.split('=')[0], v = decodeURIComponent(item.split('=')[1]);
+        (k in qd) ? qd[k].push(v) : qd[k] = [v,];
+    });
+    return qd;
+}
+
+function isHiRes {
+    return ('hires' in query() && query().hires.length > 0 && parseInt(query().hires[0]) > 0);
+}
+
+// Convert current time to binary 
+function binaryize() {
+    var now = new Date();
+    if ('utcoffset' in query() && query().utcoffset.length > 0 && !isNaN(parseInt(query().utcoffset[0]))) {
+        var hours = now.getHours();
+        var localOffset = now.getTimezoneOffset();
+        var queryOffset = parseInt(query().utcoffset[0]);
+        hours = hours + Math.floor(localOffset / 60);
+        if (localOffset < 0) {
+            localOffset = localOffset * -1;
+            localOffset = localOffset % 60;
+            localOffset = localOffset * -1;
+        } else {
+            localOffset = localOffset % 60;
+        }
+        var minutes = now.getMinutes() + localOffset;
+        while (minutes < 0) {
+            hours -= 1;
+            minutes += 60;
+        }
+        while (minutes >= 60) {
+            hours += 1;
+            minutes -= 60;
+        }
+        hours += queryOffset;
+        hours = hours % 24;
+    } else {
+        var hours = now.getHours();
+        var minutes = now.getMinutes();
+    }
+    var seconds = now.getSeconds();
+    var milli = now.getMilliseconds();
+    var fract = hours / 24 + minutes / 1440 + seconds / 86400 + milli / 86400000;
+    var j = 1;
+    var digits = isHiRes() ? 20 : 16;
+    for (i = 1; i <= digits; i++) {
+        j = Math.floor(2 * fract);
+        if (j > 0) {
+            eval("document.getElementById('C" + i + "').style.backgroundColor = 'white'");
+        } else {
+            eval("document.getElementById('C" + i + "').style.backgroundColor = 'black'");
+        }
+        fract = 2 * fract - j;
+    }
+}
+
+function init() {
+    // Update the clock every 1048476th of a day (rounded to the nearest millisecond) 
+    // This is sixteen times faster than the last bit flips (in the default low-res mode) so as to ensure smooth flipping
+    if (!isHiRes()) {
+        document.getElementById('hires').style.display = 'none';
+    }
+    setInterval("binaryize()", 82);
+}
+        </script>
+        <style type="text/css">
+            html,
+            body,
+            table {
+                padding: 0;
+                margin: 0;
+                height: 100%;
+                width: 100%;
+            }
+        </style>
+    <head>
+    <body class="center" onload="init()">
+        <table cellspacing="0">
+            <tr>
+                <td id="C1"></td>
+                <td id="C2"></td>
+                <td id="C3"></td>
+                <td id="C4"></td>
+            </tr>
+            <tr>
+                <td id="C5"></td>
+                <td id="C6"></td>
+                <td id="C7"></td>
+                <td id="C8"></td>
+            </tr>
+            <tr>
+                <td id="C9"></td>
+                <td id="C10"></td>
+                <td id="C11"></td>
+                <td id="C12"></td>
+            </tr>
+            <tr>
+                <td id="C13"></td>
+                <td id="C14"></td>
+                <td id="C15"></td>
+                <td id="C16"></td>
+            </tr>
+            <tr id="hires">
+                <td id="C17"></td>
+                <td id="C18"></td>
+                <td id="C19"></td>
+                <td id="C20"></td>
+            </tr>
+        </table>
+    </body>
+</html>
