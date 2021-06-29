@@ -4,7 +4,7 @@
         <title>Abulsme True Binary Time, Fenhl's edition</title>
         <meta charset="utf-8" />
         <link rel="stylesheet" type="text/css" href="https://fenhl.net/lib/fenhl.css" />
-        <link rel="shortcut icon" href="https://fenhl.net/ava/pineapple/p-sq-16.png" />
+        <link id="favicon" rel="shortcut icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAEklEQVQImWNoaGj4j4wZSBcAAEKHJ/GnAloWAAAAAElFTkSuQmCC" />
         <script type="text/javascript">
 /*******************************************************************************
 * Snarkles.Net Useless Binary Time (SNUBT)
@@ -42,11 +42,12 @@
 * Fenhl Fullscreen True Binary Time
 * 
 * Modified from Abulsme's code to use a simple table and black and white colors
-* rather than images. It's also fullscreen no matter the screen size.
+* rather than images. It's also fullscreen no matter the screen size. It also
+* updates the favicon to show the same image.
 *
 * Author: Fenhl - https://fenhl.net/ - fenhl@fenhl.net
-* Version: 2.0.0
-* Date: 08 May 2015
+* Version: 2.1.0
+* Date: 29 June 2021
 *
 * Feel free to use this on your site, but please leave these comments 
 * intact too. Thanks. :)
@@ -101,15 +102,27 @@ function binaryize() {
     var fract = hours / 24 + minutes / 1440 + seconds / 86400 + milli / 86400000;
     var j = 1;
     var digits = isHiRes() ? 20 : 16;
+    var canvas = document.createElement('canvas');
+    canvas.width = 4;
+    canvas.height = 4;
+    var context = canvas.getContext('2d');
     for (i = 1; i <= digits; i++) {
         j = Math.floor(2 * fract);
         if (j > 0) {
             eval("document.getElementById('C" + i + "').style.backgroundColor = 'white'");
+            context.fillStyle = 'white';
         } else {
             eval("document.getElementById('C" + i + "').style.backgroundColor = 'black'");
+            context.fillStyle = 'black';
+        }
+        if (i <= 16) {
+            var x = (i - 1) % 4;
+            var y = Math.floor((i - 1) / 4);
+            context.fillRect(x, y, 1, 1);
         }
         fract = 2 * fract - j;
     }
+    document.getElementById('favicon').href = canvas.toDataURL('image/png');
 }
 
 function init() {
